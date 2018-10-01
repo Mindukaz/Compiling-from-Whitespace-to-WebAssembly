@@ -16,6 +16,7 @@ Date | Hours | Summary
 
 Date | Hours | Summary
 -----|-----|-----
+01/10/2018 | 2 | Figured out how to compile and run C++ programs in WebAssembly. 
 
 ## Week 4
 

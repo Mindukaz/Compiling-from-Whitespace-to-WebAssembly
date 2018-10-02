@@ -17,6 +17,7 @@ Date | Hours | Summary
 Date | Hours | Summary
 -----|-----|-----
 01/10/2018 | 3 | Figured out how to compile and run C++ programs in WebAssembly. Reaserched Whitespace interpreters and compilers. Reaserched languages similar to Whitespace, such as Forth and other esoteric langaues.
+02/10/2018 | 1 | Documenting Reaserch / tools / implememntation choices / etc.
 
 ## Week 4
 

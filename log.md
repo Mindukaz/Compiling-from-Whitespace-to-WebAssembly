@@ -18,6 +18,7 @@ Date | Hours | Summary
 -----|-----|-----
 01/10/2018 | 3 | Figured out how to compile and run C++ programs in WebAssembly. Reaserched Whitespace interpreters and compilers. Reaserched languages similar to Whitespace, such as Forth and other esoteric langaues.
 02/10/2018 | 1 | Documenting Reaserch / tools / implememntation choices / etc.
+07/10/2018 | 8 | Started writing the whitespace to c++ 'converter'. Almost finished parsing the whitespace source code, having problems with stack manipulation commands. Somtimes the parsing stage tries to convert a very large binary string that does not exist in the source. Most likely failing to detect a new line, and reading in commands as part of a parameter. Also throwing a few synatx errors. Not sure if the code, or the source files have actaul sytax errors the the online interpreter ignores.
 
 ## Week 4
 

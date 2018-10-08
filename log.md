@@ -24,7 +24,7 @@ Date | Hours | Summary
 
 Date | Hours | Summary
 -----|-----|-----
-08/10/2018 | 2 | Found out there are 2 more commands for whitespace. Create a whitespace source file that runs all the commands. 
+08/10/2018 | 3 | Found out there are 2 more commands for whitespace. Create a whitespace source file that runs all the commands. Refactored Whitespace converter/parser. Made it more readable and easier to debug.
 
 ## Week 5
 

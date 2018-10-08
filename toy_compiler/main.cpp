@@ -25,10 +25,6 @@ void error(string error)
 
 string get_bits(int location)
 {
-	// does this function need to distinguis between labels and integers?
-	// do the new instruction (slide, copy) use the sign bit at the beginning? 
-	// do i need to worry about it?
-	// output looks like i should be working around it
 	string bits = "";
 	while(text_chars[location] != LF)
 	{
@@ -45,26 +41,30 @@ int get_bits_end(int location)
 	return location + 1;
 }
 
+bool pos_or_neg(int location)
+{
+	if(text_chars[location] == SPACE) return true;
+	else if(text_chars[location] == TAB) return false;
+	else error("Syntax error");
+}
+
+int get_value(string bits)
+{
+	if(bits == "") return 0;
+	else return stoi(bits, nullptr, 2);
+}
+
 int stack_manipulation(int location)
 {
 	//cout << "stack manipulation" << endl;
-
+	
+	int value;
 	// Push value onto stack
 	if(text_chars[location + 1] == SPACE)
 	{	
-		// determine if value is positive or negative
-		bool positive_value;
-		if(text_chars[location + 2] == SPACE) positive_value = true;
-		else if(text_chars[location + 2] == TAB) positive_value = false;
-	
-		// get the bits representing the value
-		string bits = get_bits(location + 3);
-		
 		// get integer value from bits
-		int value;
-		if(bits == "") value = 0; 
-		else value = stoi(bits, nullptr, 2);
-		if(!positive_value) value *=  -1;
+		value = get_value(get_bits(location + 3));
+		if(!pos_or_neg(location + 2)) value *=  -1;
 
 		instructions.push_back("stack push " + to_string(value));
 		return get_bits_end(location + 3);
@@ -88,15 +88,17 @@ int stack_manipulation(int location)
 	// Deep stack manipulation
 	else if(text_chars[location + 1] == TAB)
 	{
+		value = get_value(get_bits(location + 4));
+		if(!pos_or_neg(location + 3)) value *= -1;
 		switch(text_chars[location + 2])
 		{
-			case SPACE: instructions.push_back("stack copy " + get_bits(location + 3));
+			case SPACE: instructions.push_back("stack copy " + to_string(value));
 				    break;
-			case LF: instructions.push_back("stack slide " + get_bits(location + 3));
+			case LF: instructions.push_back("stack slide " + to_string(value));
 				 break;
 			default: error("Syntax error");
 		}
-		return get_bits_end(location + 3);
+		return get_bits_end(location + 4);
 	}
 }
 
@@ -164,7 +166,7 @@ int flow_control(int location)
 				    case LF: instructions.push_back("flow jump " + get_bits(location + 3));
 					     break;
 			    }
-			    break;
+			    return get_bits_end(location + 3);
 		case TAB: switch(text_chars[location + 2])
 			  {
 				  case SPACE: instructions.push_back("flow jump 0 " + get_bits(location + 3));
@@ -174,12 +176,11 @@ int flow_control(int location)
 				  case LF: instructions.push_back("flow end subroutine");
 					   break;
 			  }
-			  break;
+			  return get_bits_end(location + 3);
 		case LF: if(text_chars[location + 2] == LF) instructions.push_back("flow end program");
 			 else error("Syntax error");
-			 break;
+			 return location + 3;
 	}
-	return get_bits_end(location + 3);
 }
 
 int io(int location)
@@ -246,6 +247,19 @@ void identify_commands()
 	}	
 }
 
+void write_file()
+{
+	ofstream file("whitesapce.cpp");
+
+	file << "#include <stack>" << endl << "#include <vector>" << endl;
+	file << "int main()" << endl << "{" << endl;
+	file << "\tstd::stack<int> stack;" << endl;
+	file << "\tstd::vector<int> heap;" << endl;
+
+	file << "}" << endl;
+	file.close();
+}
+
 
 int main(int argc, char* argv[])
 {	
@@ -275,6 +289,7 @@ int main(int argc, char* argv[])
 	for(auto &i : instructions) cout << i << endl;
 
 	// write cpp eqivalent commands to a new file
+	write_file();
 
 	
 	// make script to compile new file to wasm????	

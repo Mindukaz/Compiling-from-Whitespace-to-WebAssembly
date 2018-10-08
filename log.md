@@ -24,6 +24,7 @@ Date | Hours | Summary
 
 Date | Hours | Summary
 -----|-----|-----
+08/10/2018 | 2 | Found out there are 2 more commands for whitespace. Create a whitespace source file that runs all the commands. 
 
 ## Week 5
 

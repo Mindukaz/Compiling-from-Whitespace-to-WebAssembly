@@ -1,3 +1,9 @@
+#include <stack>
+#include <vector>
+#include <iostream>
+std::stack<int> stack;
+std::vector<int> heap;
+
 void stack_push(int value)
 {
 	stack.push(value);
@@ -10,10 +16,10 @@ void stack_duplicate()
 
 void stack_copy(int n)
 {
+	vactor<int> temp;
 	if(n > stack.size() || n < 1) stack.push(NULL);
 	else
 	{
-		vector<int> temp;
 		while(n != 0)
 		{
 			temp.push_back(stack.top());
@@ -96,15 +102,15 @@ void arithmetic_mod()
 
 void heap_store()
 {
-	int value = satck.top();
+	int value = stack.top();
 	stack.pop();
 	int address = stack.top();
-	stack.pop()
+	stack.pop();
 	if(address > heap.size()-1) while(heap.size()-1 != address) heap.push_back(NULL);
 	heap[address] = value;
 }
 
-void heap_retrieve(int address)
+void heap_retrieve()
 {
 	int address = stack.top();
 	stack.pop();
@@ -117,20 +123,20 @@ void io_out_char()
 	int temp = stack.top();
 	stack.pop();
 	char temp1 = '0' + temp;
-	cout << temp1;
+	std::cout << temp1;
 }
 
 void io_out_num()
 {
 	int temp = stack.top();
 	stack.pop();
-	cout << temp;
+	std::cout << temp;
 }
 
 void io_in_char()
 {
 	char temp;
-	cin >> temp;
+	std::cin >> temp;
 	int temp1 = temp - '0';
 	stack.push(temp1);
 	heap_store();
@@ -139,7 +145,7 @@ void io_in_char()
 void io_in_num()
 {
 	int temp;
-	cin >> temp;
+	std::cin >> temp;
 	stack.push(temp);
-	heap_store():
+	heap_store();
 }

@@ -12,6 +12,8 @@ using namespace std;
 vector<int> text_chars;
 int char_num = 0;
 vector<string> instructions;
+int line = 1;
+char dynamic_label = 'A';
 
 // need a stack (linked list of nodes)
 // need a heap (just an array? size could be defined dynamically by program??
@@ -19,7 +21,7 @@ vector<string> instructions;
 
 void error(string error)
 {
-	cerr << error << endl;
+	cerr << "Line:" << line << " " <<  error << endl;
 	exit(1);
 }
 
@@ -38,6 +40,7 @@ string get_bits(int location)
 int get_bits_end(int location)
 {
 	while((text_chars[location] != LF) && (location < char_num)) location++;
+	line++;
 	return location + 1;
 }
 
@@ -66,19 +69,21 @@ int stack_manipulation(int location)
 		value = get_value(get_bits(location + 3));
 		if(!pos_or_neg(location + 2)) value *=  -1;
 
-		instructions.push_back("stack push " + to_string(value));
+		instructions.push_back("stack_push(" + to_string(value) + ");");
 		return get_bits_end(location + 3);
 	}
 	// Value manipulation
 	else if(text_chars[location + 1] == LF)
 	{
+		line++;
 		switch(text_chars[location + 2])
 		{
-			case SPACE: instructions.push_back("stack duplicate");
+			case SPACE: instructions.push_back("stack_duplicate();");
 				    break;
-			case TAB: instructions.push_back("stack swap");
+			case TAB: instructions.push_back("stack_swap();");
 				  break;
-			case LF: instructions.push_back("stack discard");
+			case LF: line++;
+				 instructions.push_back("stack_discard();");
 				 break;
 			default: error("Syntax error");
 	
@@ -92,9 +97,10 @@ int stack_manipulation(int location)
 		if(!pos_or_neg(location + 3)) value *= -1;
 		switch(text_chars[location + 2])
 		{
-			case SPACE: instructions.push_back("stack copy " + to_string(value));
+			case SPACE: instructions.push_back("stack_copy(" + to_string(value) +");");
 				    break;
-			case LF: instructions.push_back("stack slide " + to_string(value));
+			case LF: line++;
+				 instructions.push_back("stack_slide(" + to_string(value) + ");");
 				 break;
 			default: error("Syntax error");
 		}
@@ -110,11 +116,12 @@ int arithmetic(int location)
 	{
 		switch(text_chars[location + 3])
 		{
-			case SPACE: instructions.push_back("arithmetic add");
+			case SPACE: instructions.push_back("arithmetic_add();");
 				    break;
-			case TAB: instructions.push_back("arithmetic sub");
+			case TAB: instructions.push_back("arithmetic_sub();");
 				  break;
-			case LF: instructions.push_back("arithmetic mul");
+			case LF: line++;
+				 instructions.push_back("arithmetic_mul();");
 				 break;
 			default: error("Syntax error");
 		}
@@ -123,9 +130,9 @@ int arithmetic(int location)
 	{
 		switch(text_chars[location + 3])
 		{
-			case SPACE: instructions.push_back("arithmetic div");
+			case SPACE: instructions.push_back("arithmetic_div();");
 				    break;
-			case TAB: instructions.push_back("arithmetic mod");
+			case TAB: instructions.push_back("arithmetic_mod();");
 				  break;
 			default: error("Syntax error");
 		}
@@ -141,9 +148,9 @@ int heap_access(int location)
 
 	switch(text_chars[location + 2])
 	{
-		case SPACE: instructions.push_back("heap store");
+		case SPACE: instructions.push_back("heap_store();");
 			    break;
-		case TAB: instructions.push_back("heap retrieve");
+		case TAB: instructions.push_back("heap_retrieve();");
 			  break;
 		default: error("Syntax error");
 	}
@@ -159,25 +166,33 @@ int flow_control(int location)
 	{
 		case SPACE: switch(text_chars[location + 2])
 			    {
-				    case SPACE: instructions.push_back("flow mark " + get_bits(location + 3));
+				    case SPACE: instructions.push_back("label_" + get_bits(location + 3) + ":");
 						break;
-				    case TAB: instructions.push_back("flow call subroutine " + get_bits(location + 3));
+				    case TAB: dynamic_label++;
+					      instructions.push_back("last_call = \"label_\" + dynamic_label++; " + string("goto label_") + get_bits(location + 3) + ";" + "\nlabel_" + dynamic_label + ":");
 					      break;
-				    case LF: instructions.push_back("flow jump " + get_bits(location + 3));
+				    case LF: line++;
+					     instructions.push_back("goto label_" + get_bits(location + 3) + ";");
 					     break;
 			    }
 			    return get_bits_end(location + 3);
 		case TAB: switch(text_chars[location + 2])
 			  {
-				  case SPACE: instructions.push_back("flow jump 0 " + get_bits(location + 3));
+				  case SPACE: instructions.push_back("if(stack.top() == 0) goto label_" + get_bits(location + 3) + ";");
 					      break;
-				  case TAB: instructions.push_back("flow jump neg " + get_bits(location + 3));
+				  case TAB: instructions.push_back("if(stack.top() < 0) goto label_" + get_bits(location + 3) + ";");
 					    break;
-				  case LF: instructions.push_back("flow end subroutine");
+				  case LF: line++;
+					   instructions.push_back("goto  last_call;");
 					   break;
 			  }
 			  return get_bits_end(location + 3);
-		case LF: if(text_chars[location + 2] == LF) instructions.push_back("flow end program");
+		case LF: line++;
+			 if(text_chars[location + 2] == LF) 
+			 {
+				 line++;
+				 instructions.push_back("return 0;");
+			 }
 			 else error("Syntax error");
 			 return location + 3;
 	}
@@ -191,9 +206,9 @@ int io(int location)
 	{
 		switch(text_chars[location + 3])
 		{
-			case SPACE: instructions.push_back("io out char");
+			case SPACE: instructions.push_back("io_out_char();");
 				    break;
-			case TAB: instructions.push_back("io out num");
+			case TAB: instructions.push_back("io_out_num();");
 				  break;
 			default: error("Syntax error");
 		}
@@ -202,9 +217,9 @@ int io(int location)
 	{
 		switch(text_chars[location + 3])
 		{
-			case SPACE: instructions.push_back("io in char");
+			case SPACE: instructions.push_back("io_in_char();");
 				    break;
-			case TAB: instructions.push_back("io in num");
+			case TAB: instructions.push_back("io_in_num();");
 				  break;
 			default: error("Syntax error");
 		}
@@ -229,7 +244,8 @@ void identify_commands()
 					case SPACE: i = arithmetic(i);
 						    break;
 
-					case LF: i = io(i);
+					case LF: line++;
+						 i = io(i);
 						 break;
 					
 					case TAB: i = heap_access(i);
@@ -239,7 +255,8 @@ void identify_commands()
 				} 
 				break;
 				
-			case LF: i = flow_control(i);
+			case LF: line++;
+				 i = flow_control(i);
 				 break;
 		
 			default: error("Syntax error");
@@ -251,10 +268,17 @@ void write_file()
 {
 	ofstream file("whitesapce.cpp");
 
-	file << "#include <stack>" << endl << "#include <vector>" << endl;
+	//file << "#include <stack>" << endl;
+	//file << "#include <vector>" << endl;
+	//file << "#include <iostream>" << endl;
+	file << "#include \"instructions.h\"" << endl;
+	//file << "std::stack<int> stack;" << endl;
+	//file << "std::vector<int> heap" << endl;
+	file << "std::string last_call;" << endl;
+	file << "char dynamic_label = 'A';" << endl;
 	file << "int main()" << endl << "{" << endl;
-	file << "\tstd::stack<int> stack;" << endl;
-	file << "\tstd::vector<int> heap;" << endl;
+
+	for(auto &i : instructions) file << i << endl;
 
 	file << "}" << endl;
 	file.close();
@@ -286,7 +310,7 @@ int main(int argc, char* argv[])
 	// iterate over array to identify commands
 	identify_commands();
 
-	for(auto &i : instructions) cout << i << endl;
+	//for(auto &i : instructions) cout << i << endl;
 
 	// write cpp eqivalent commands to a new file
 	write_file();

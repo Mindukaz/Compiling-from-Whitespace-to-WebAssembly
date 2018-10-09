@@ -1,15 +1,13 @@
 #include <stack>
 #include <iostream>
 
+using namespace std;
+
 int main()
 {
-	std::stack<int> stack;
-	stack.push(0);
-	stack.push(1);
+	char val = 'A';
 
-	while(!stack.empty())
-	{
-		std::cout << stack.top() << std::endl;
-		stack.pop();
-	}
+	val++;
+
+	cout << val << endl;
 }

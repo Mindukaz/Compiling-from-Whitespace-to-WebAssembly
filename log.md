@@ -25,6 +25,7 @@ Date | Hours | Summary
 Date | Hours | Summary
 -----|-----|-----
 08/10/2018 | 7 | Found out there are 2 more commands for whitespace. Create a whitespace source file that runs all the commands. Refactored Whitespace converter/parser. Made it more readable and easier to debug. Fixed the whitespace parsing (i think). Wrote the C++ equivalent of whitespace instructions, and began writing the code that will generate the C++ source code that equivalent to a whitespace source.
+09/10/2018 | 2 | Continued working on the whitespace translator/parser/toy compiler. Erro fixing, and more refactoring. Supervisor gave an idea on how to implement returning from subroutine calls.
 
 ## Week 5
 

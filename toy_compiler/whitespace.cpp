@@ -1,6 +1,7 @@
-#include "instructions.h"
-std::string last_call;
-char dynamic_label = 'A';
+#include "instructions.cpp"
+static void* return_stack[100];
+int stack_index = 0;
+int cmp;
 int main()
 {
 stack_push(0);
@@ -39,15 +40,18 @@ label_1:
 stack_push(1);
 arithmetic_sub();
 stack_duplicate();
-if(stack.top() == 0) goto label_11;
+cmp = stack.top(); stack.pop();
+if(cmp  == 0) goto label_11;
 goto label_1;
 label_11:
 stack_duplicate();
-if(stack.top() < 0) goto label_111;
+cmp = stack.top(); stack.pop();
+if(cmp < 0) goto label_111;
 stack_discard();
 goto label_11;
 label_111:
-last_call = "label_" + dynamic_label++; goto label_1111;
+return_stack[stack_index++] = &&label_B;
+goto label_1111;
 label_B:
 return 0;
 label_1111:
@@ -60,5 +64,5 @@ io_out_char();
 stack_push(2);
 io_in_num();
 io_out_num();
-goto  last_call;
+goto *return_stack[--stack_index];
 }

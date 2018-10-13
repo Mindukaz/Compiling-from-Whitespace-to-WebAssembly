@@ -15,9 +15,6 @@ vector<string> instructions;
 int line = 1;
 char dynamic_label = 'A';
 
-// need a stack (linked list of nodes)
-// need a heap (just an array? size could be defined dynamically by program??
-
 
 void error(string error)
 {
@@ -169,21 +166,21 @@ int flow_control(int location)
 				    case SPACE: instructions.push_back("label_" + get_bits(location + 3) + ":");
 						break;
 				    case TAB: dynamic_label++;
-					      instructions.push_back("last_call = \"label_\" + dynamic_label++; " + string("goto label_") + get_bits(location + 3) + ";" + "\nlabel_" + dynamic_label + ":");
+					      instructions.push_back(string("return_stack[stack_index++] = &&label_") + dynamic_label + string(";\ngoto label_") + get_bits(location + 3) + ";\nlabel_" + dynamic_label + ":");
 					      break;
 				    case LF: line++;
-					     instructions.push_back("goto label_" + get_bits(location + 3) + ";");
+					     instructions.push_back("goto label_" + get_bits(location + 3)+ ";");
 					     break;
 			    }
 			    return get_bits_end(location + 3);
 		case TAB: switch(text_chars[location + 2])
 			  {
-				  case SPACE: instructions.push_back("if(stack.top() == 0) goto label_" + get_bits(location + 3) + ";");
+				  case SPACE: instructions.push_back("cmp = stack.top(); stack.pop();\nif(cmp  == 0) goto label_" + get_bits(location + 3) + ";");
 					      break;
-				  case TAB: instructions.push_back("if(stack.top() < 0) goto label_" + get_bits(location + 3) + ";");
+				  case TAB: instructions.push_back("cmp = stack.top(); stack.pop();\nif(cmp < 0) goto label_" + get_bits(location + 3) + ";");
 					    break;
 				  case LF: line++;
-					   instructions.push_back("goto  last_call;");
+					   instructions.push_back("goto *return_stack[--stack_index];");
 					   break;
 			  }
 			  return get_bits_end(location + 3);
@@ -266,19 +263,21 @@ void identify_commands()
 
 void write_file()
 {
-	ofstream file("whitesapce.cpp");
+	ofstream file("whitespace.cpp");
 
 	//file << "#include <stack>" << endl;
 	//file << "#include <vector>" << endl;
 	//file << "#include <iostream>" << endl;
-	file << "#include \"instructions.h\"" << endl;
+	file << "#include \"instructions.cpp\"" << endl;
 	//file << "std::stack<int> stack;" << endl;
 	//file << "std::vector<int> heap" << endl;
-	file << "std::string last_call;" << endl;
-	file << "char dynamic_label = 'A';" << endl;
+	file << "static void* return_stack[100];" << endl;
+	file << "int stack_index = 0;" << endl;
+	file << "int cmp;" << endl;
 	file << "int main()" << endl << "{" << endl;
 
 	for(auto &i : instructions) file << i << endl;
+
 
 	file << "}" << endl;
 	file.close();

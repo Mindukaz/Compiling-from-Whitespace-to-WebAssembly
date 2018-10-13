@@ -16,8 +16,8 @@ void stack_duplicate()
 
 void stack_copy(int n)
 {
-	vactor<int> temp;
-	if(n > stack.size() || n < 1) stack.push(NULL);
+	std::vector<int> temp;
+	if(n > stack.size() || n < 1) stack.push(0);
 	else
 	{
 		while(n != 0)
@@ -106,7 +106,13 @@ void heap_store()
 	stack.pop();
 	int address = stack.top();
 	stack.pop();
-	if(address > heap.size()-1) while(heap.size()-1 != address) heap.push_back(NULL);
+	if(address > heap.capacity()) 
+	{
+		while((heap.capacity()) < address)
+		{	
+			heap.push_back(0);
+		}
+	}
 	heap[address] = value;
 }
 
@@ -114,7 +120,7 @@ void heap_retrieve()
 {
 	int address = stack.top();
 	stack.pop();
-	if(address > heap.size()-1) stack.push(NULL);
+	if(address > heap.capacity()) stack.push(0);
 	else stack.push(heap[address]);
 }
 
@@ -136,6 +142,7 @@ void io_out_num()
 void io_in_char()
 {
 	char temp;
+	std::cout << "Input a character:";
 	std::cin >> temp;
 	int temp1 = temp - '0';
 	stack.push(temp1);
@@ -145,6 +152,7 @@ void io_in_char()
 void io_in_num()
 {
 	int temp;
+	std::cout << "Input an integer:";
 	std::cin >> temp;
 	stack.push(temp);
 	heap_store();

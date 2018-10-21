@@ -30,8 +30,7 @@ Date | Hours | Summary
 
 ## Week 5
 
-Date | Hours | Summary
------|-----|-----
+assessments, assessments and more assessments :/
 
 ## Week 6
 

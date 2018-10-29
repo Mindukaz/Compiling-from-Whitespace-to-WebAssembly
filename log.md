@@ -34,10 +34,10 @@ assessments, assessments and more assessments :/
 
 ## Week 6
 
-Date | Hours | Summary
------|-----|-----
+pesky assessments
 
 ## Week 7
 
 Date | Hours | Summary
 -----|-----|-----
+29/10/2018 | 1 | Created the whitestacpe test suit repository and began populating it with simple test programs.

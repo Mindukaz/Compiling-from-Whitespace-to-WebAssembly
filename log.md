@@ -28,16 +28,21 @@ Date | Hours | Summary
 09/10/2018 | 2 | Continued working on the whitespace translator/parser/toy compiler. Erro fixing, and more refactoring. Supervisor gave an idea on how to implement returning from subroutine calls.
 13/10/2018 | 4 | Got the toy compiler/translator working and generating correct C++ source files. Removed all bugs (i think).
 
-## Week 5
+## Weeks 5 and 6
 
 assessments, assessments and more assessments :/
-
-## Week 6
-
-pesky assessments
 
 ## Week 7
 
 Date | Hours | Summary
 -----|-----|-----
-29/10/2018 | 1 | Created the whitestacpe test suit repository and began populating it with simple test programs.
+29/10/2018 | 1 | Created the whitespace test suite repository and began populating it with simple test programs.
+
+## Weeks 8, 9, 10 and 11
+
+5 modules was a mistake........
+
+## Week 12
+
+Date | Hours | Summary
+-----|-----|-----

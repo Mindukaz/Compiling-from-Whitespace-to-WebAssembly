@@ -128,7 +128,7 @@ void io_out_char()
 {
 	int temp = stack.top();
 	stack.pop();
-	char temp1 = '0' + temp;
+	char temp1 = (char)temp;
 	std::cout << temp1;
 }
 
@@ -144,7 +144,7 @@ void io_in_char()
 	char temp;
 	std::cout << "Input a character:";
 	std::cin >> temp;
-	int temp1 = temp - '0';
+	int temp1 = (int)temp;
 	stack.push(temp1);
 	heap_store();
 }

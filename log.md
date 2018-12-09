@@ -10,7 +10,7 @@ Date | Hours | Summary
 -----|-----|-----
 24/09/2018 | 1 | Created and and prepared github repository. Prepared dissertation template from moodle.
 25/09/2018 | 1 | Planned out the project week by week. Started reading the tiger book for compilers. Installed Mendeley for reference management.
-30/09/2018 | 3 | Created Hello World and Fibonacci in Whitespace. Created their respective programs in C++ aswell. 
+30/09/2018 | 3 | Created Hello World and Fibonacci in Whitespace. Created their respective programs in C++ aswell.
 
 ## Week 3
 
@@ -46,3 +46,4 @@ Date | Hours | Summary
 
 Date | Hours | Summary
 -----|-----|-----
+09/12/2018 | 3 | Populated the whitespace test suite with tests for each individual command in the langauge. Need to add more general, full program tests and take a closer look at the fibonacci program.

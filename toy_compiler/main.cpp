@@ -57,11 +57,11 @@ int get_value(string bits)
 int stack_manipulation(int location)
 {
 	//cout << "stack manipulation" << endl;
-	
+
 	int value;
 	// Push value onto stack
 	if(text_chars[location + 1] == SPACE)
-	{	
+	{
 		// get integer value from bits
 		value = get_value(get_bits(location + 3));
 		if(!pos_or_neg(location + 2)) value *=  -1;
@@ -83,7 +83,7 @@ int stack_manipulation(int location)
 				 instructions.push_back("stack_discard();");
 				 break;
 			default: error("Syntax error");
-	
+
 		}
 		return location + 3;
 	}
@@ -185,7 +185,7 @@ int flow_control(int location)
 			  }
 			  return get_bits_end(location + 3);
 		case LF: line++;
-			 if(text_chars[location + 2] == LF) 
+			 if(text_chars[location + 2] == LF)
 			 {
 				 line++;
 				 instructions.push_back("return 0;");
@@ -235,7 +235,7 @@ void identify_commands()
 		{
 			case SPACE: i = stack_manipulation(i);
 				    break;
-			
+
 			case TAB: switch(text_chars[i+1])
 				{
 					case SPACE: i = arithmetic(i);
@@ -244,33 +244,28 @@ void identify_commands()
 					case LF: line++;
 						 i = io(i);
 						 break;
-					
+
 					case TAB: i = heap_access(i);
 						  break;
 
 					default: error("Synatx error");
-				} 
+				}
 				break;
-				
+
 			case LF: line++;
 				 i = flow_control(i);
 				 break;
-		
+
 			default: error("Syntax error");
 		}
-	}	
+	}
 }
 
 void write_file()
 {
 	ofstream file("whitespace.cpp");
 
-	//file << "#include <stack>" << endl;
-	//file << "#include <vector>" << endl;
-	//file << "#include <iostream>" << endl;
 	file << "#include \"instructions.cpp\"" << endl;
-	//file << "std::stack<int> stack;" << endl;
-	//file << "std::vector<int> heap" << endl;
 	file << "static void* return_stack[100];" << endl;
 	file << "int stack_index = 0;" << endl;
 	file << "int cmp;" << endl;
@@ -285,7 +280,7 @@ void write_file()
 
 
 int main(int argc, char* argv[])
-{	
+{
 	//read  in contents of provided file
 	ifstream file(argv[1]);
 	if(!file) error("File not found");
@@ -305,16 +300,15 @@ int main(int argc, char* argv[])
 	}
 	else error("Could not open file");
 	file.close();
-	
+
 	// iterate over array to identify commands
 	identify_commands();
 
-	//for(auto &i : instructions) cout << i << endl;
 
-	// write cpp eqivalent commands to a new file
+	// write cpp equivalent commands to a new file
 	write_file();
 
-	
-	// make script to compile new file to wasm????	
+
+	// make script to compile new file to wasm????
 	return 0;
 }

@@ -42,7 +42,7 @@ Date | Hours | Summary
 
 5 modules was a mistake........
 
-## Week 12
+## Week 12 - End of Semester
 
 Date | Hours | Summary
 -----|-----|-----

@@ -1,0 +1,44 @@
+// this will be a comment (pls duh)
+
+// stack manipulation
+
+push <value>     // push onto stack
+duplicate        // duplicate stack top item
+copy <value>     // copy nth item into stack to the top
+swap             // swap top two items on stack
+discard          // drop top item of stack
+slide <value>    // remove n items of the stack, keeping the top item
+
+
+// arithmetic
+
+add  // add top 2 items on stack
+sub  // subtract top 2 items on stack
+mul  // multiply top 2 item on stack
+div  // divide top 2 items on stack
+mod  // modulo of top 2 items on stack
+
+
+// heap access
+
+store      // store the value at top of stack at adress of 2nd top of stack
+retrieve   // retrieve item from heap at adress at top of stack
+
+
+// flow control
+
+mark <number>   // creates a label named <number>
+call <number>   // calls the subroutine <number>
+jump <number>   // jumps to <number>
+jumpz <number>  // jumps to <number> if stack top is 0
+jumpn <number>  // jumps to <number if stack top is negative.
+return          // ends a subroutine and jumps back to caller
+end             // ends the program
+
+
+// io
+
+out_char       // output char at top of stack
+out_num        // output number at top of stack
+read_char      // read char into heap adress at top of stack
+read_num       // read num into heap adress at top of stack

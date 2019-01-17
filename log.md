@@ -75,4 +75,4 @@ Should be working on this..........
 Date | Hours | Summary
 -----|-----|-----
 16/01/2019 | 2 | Started implementing a readable version of whitespace, to make it easier to write large whitespace programs
-17/01/2019 | 3 | Finished the readable whitespace to whitespace translator.
+17/01/2019 | 5 | Finished the readable whitespace to whitespace translator. Started writing the actual compiler (finally) and integrated the readable whitespace translator into the compiler. This way I will be able to compile both whitespace source and readable whitespace source with the same program.

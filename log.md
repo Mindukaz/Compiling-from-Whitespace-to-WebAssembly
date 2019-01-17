@@ -4,7 +4,7 @@
 
 I was being lazy :/
 
-## Week 2 - Start of Classes
+## Week 2 - Start of Semester 1 Classes
 
 Date | Hours | Summary
 -----|-----|-----
@@ -47,3 +47,32 @@ Date | Hours | Summary
 Date | Hours | Summary
 -----|-----|-----
 09/12/2018 | 3 | Populated the whitespace test suite with tests for each individual command in the langauge. Need to add more general, full program tests and take a closer look at the fibonacci program.
+
+## Week 13
+
+December lazyness at its worst
+
+## Week 14
+
+Date | Hours | Summary
+-----|-----|-----
+22/12/2018 | 2 | Background reading on compiler design.
+
+## Week 15 - Christmas
+
+Nope
+
+## Week 16 - New Year
+
+Also nope
+
+## Week 17 - Start of Semester 2
+
+Should be working on this..........
+
+## Week 18
+
+Date | Hours | Summary
+-----|-----|-----
+16/01/2019 | 2 | Started implementing a readable version of whitespace, to make it easier to write large whitespace programs
+17/01/2019 | 3 | Finished the readable whitespace to whitespace translator.

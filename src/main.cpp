@@ -1,5 +1,7 @@
 #include "main.h"
 #include "wst_to_ws.h"
+#include "ws_to_wst.h"
+#include "code_gen.h"
 
 /*
  ./main.out file.ws
@@ -52,14 +54,13 @@ bool check_file_name(string fname, string extension)
 // compile readable whitespace to wasm
 void wst_to_wasm(string fname)
 {
-    cout << "wst to wasm" << endl;
+    vector<string> commands = read_file(fname);
+    generate_wasm(commands);
 }
 
 // translate readable whitespace to whitespace
 void wst_to_ws(string fname)
 {
-    cout << "wst to ws" << endl;
-
     vector<string> commands = read_file(fname);
     commands = process_commands(commands);
     write_to_file_ws(commands, fname.substr(0, fname.find(".")));
@@ -68,11 +69,14 @@ void wst_to_ws(string fname)
 // compile whitespace to wasm
 void ws_to_wasm(string fname)
 {
-    cout << "ws to wasm" << endl;
+    vector<string> c = parse_ws(fname);
+    generate_wasm(c);
 }
 
 // translate whitespace to readable whitespace
 void ws_to_wst(string fname)
 {
-    cout << "ws to wst" << endl;
+    parse_ws(fname);
+    write_file();
+    // global variable "instructions" contains the tokens / commands
 }

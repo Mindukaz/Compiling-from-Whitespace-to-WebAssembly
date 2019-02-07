@@ -1,5 +1,5 @@
-#ifndef TRANSLATOR_H
-#define TRANSLATOR_H
+#ifndef WST_TO_WS_H
+#define WST_TO_WS_H
 
 #include <iostream>
 #include <fstream>
@@ -13,7 +13,7 @@ vector<string> read_file(string file_name);
 
 string convert_to_space_tab(string binary);
 
-string get_value(string number);
+string get_value_bits(string number);
 
 string get_label(string label);
 

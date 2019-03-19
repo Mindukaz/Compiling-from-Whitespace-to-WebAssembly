@@ -10,6 +10,7 @@
  ./main.out -ws2wst file.ws
 */
 
+
 int main(int argc, char* argv[])
 {
     if (argc == 2)
@@ -45,7 +46,7 @@ void error(string error)
 
 bool check_file_name(string fname, string extension)
 {
-    size_t delimiter = fname.find(".");
+    size_t delimiter = fname.find_last_of(".");
     if(delimiter == string::npos) error("Incorrect file format");
     if(fname.substr(delimiter) == extension) return true;
     return false;
@@ -55,7 +56,7 @@ bool check_file_name(string fname, string extension)
 void wst_to_wasm(string fname)
 {
     vector<string> commands = read_file(fname);
-    generate_wasm(commands);
+    generate_wasm(commands, fname);
 }
 
 // translate readable whitespace to whitespace
@@ -70,7 +71,7 @@ void wst_to_ws(string fname)
 void ws_to_wasm(string fname)
 {
     vector<string> c = parse_ws(fname);
-    generate_wasm(c);
+    generate_wasm(c, fname);
 }
 
 // translate whitespace to readable whitespace

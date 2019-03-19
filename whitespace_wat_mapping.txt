@@ -1,0 +1,60 @@
+Look at these docs:
+https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md
+http://webassembly.github.io/spec/core/binary/instructions.html
+https://github.com/WebAssembly/design/blob/master/TextFormat.md
+https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format
+
+This:
+https://github.com/WebAssembly/design/blob/master/Semantics.md#32-bit-integer-operators
+
+
+Stack Manipulation
+
+Push        <number>   -    i32.const <number>
+                            call $push
+
+Duplicate              -    call $duplicate
+
+Copy        <number>   -    i32.const <number>
+                            call $copy
+
+Swap                   -    call $swap
+
+Discard                -    call $discard
+
+Slide      <number>    -    i32.const <number>
+                            call $slide
+
+
+Arithmetic
+
+Addition           -  call $add
+Subtraction        -  call $sub
+Multiplication     -  call $mul
+Division           -  call $div
+Modulo             -  call $mod
+
+
+Heap Access
+
+Store        -  call $store
+Retrieve     -  call $load
+
+
+Flow Control
+
+Mark           <label>  -
+Call           <label>  -  call <label>
+Jump           <label>  -
+Jump_zero      <label>  -
+Jump_negative  <label>  -
+Return                  -
+End_program             -
+
+
+I/O
+
+Output_char  - call $write_char
+Output_num   - call $write_num
+Read_char    - call $read_char
+Read_num     - call $read_num

@@ -12,10 +12,24 @@ push 108
 push 108
 push 101
 push 72
+
 mark 1
 duplicate
 jumpz 2
 out_char
 jump 1
+
 mark 2
+push 0
+push 1
+push 2
+push 3
 end
+
+mark 3
+push 6
+push 7
+push 8
+push 9
+push 4
+return

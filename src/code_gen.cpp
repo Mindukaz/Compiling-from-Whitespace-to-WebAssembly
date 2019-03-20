@@ -3,25 +3,195 @@
 void generate_wasm(vector<string> commands, string fname)
 {
     vector<string> code = map_commands(commands);
-    for(auto &thing : code) cout << thing << endl;
+    vector<string> main;
+    vector<string> subroutines;
+    tie(main, subroutines) = code_blocks(code);
 
-    // code is a vector of all commands
+    /*
+    cout << "Main Code Blocks:" << endl << endl;
+    for (auto &a : main) cout << a;
 
-    // need to loop through it, find all the subroutines (after endprog (temp identifier))
-    // and add them to the subroutines string. (make sure they are valid i.e they have a return at the end)
+    cout << endl << "Subroutines:" << endl << endl;
+    for (auto &a : subroutines) cout << a;
+    */
 
-    // then go through the main program, check jumping, insert loops if needed, and validate
-    // i.e jumping back to a label is a loop, and jumping to the next one is a br exiting a block.
+    //size_t pos = fname.find(".");
+    string name = fname.substr(0, fname.find(".")+1);
 
-    // check for an end after an end prog (will get added because of how im parsing the code)
+    string html_name = name + "html";
+    string js_name = name + "js";
+    string wat_name = name + "wat";
+    string wasm_name = name + "wasm";
+
+    string code_main;
+    string code_subroutine;
+    for (auto &instruction : main) code_main += instruction;
+    for (auto &instruction : subroutines) code_subroutine += instruction;
+
+    ofstream file;
+    file.open(html_name);
+    file << gen_html(js_name);
+    file.close();
+
+    file.open(js_name);
+    file << gen_js(wasm_name);
+    file.close();
+
+    file.open(wat_name);
+    file << gen_wat(code_main, code_subroutine);
+    file.close();
+
 
     // after this, get going with the better error handling, and test suite, and proper documentation for this.
+    // check what block is throwing an error
+    // check what label is trying to be called and print it
+
+    // errors with block jumping, print label of the block.
+
+    // make the wat file increase stack memory dynamically
+
+    // need to make sure that commands that take in a number dont segfault
+    // e.g copy will segfault the program, since it has to be copy <value>
+}
+
+tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
+{
+    vector<string> main_code;
+    vector<string> subroutines;
+
+    vector<string> label_names;
+    vector<string> subroutine_names{"$push", "$duplicate", "$copy", "$swap", "$discard", "$slide",
+                                    "$add", "$sub", "$mul", "$div", "$mod", "$store", "$load",
+                                    "$write_char", "$write_num", "$read_char", "$read_num", "$pop"};
+
+
+    bool end_prog = false;
+    bool inside_subroutine = false;
+
+    for (auto &instruction : code)
+    {
+        if (!end_prog)
+        {
+            // dealing with the main code of a whitespace program, before an "end" instruction
+            vector<string> label = split_token(instruction);
+            if (label[0] == "block")
+            {
+                if ( contains(label[1], label_names) ) error("duplicate label names");
+                label_names.push_back(label[1]);
+                main_code.push_back(instruction);
+                continue;
+            }
+            if (instruction == "endprog\n")
+            {
+                end_prog = true;
+                main_code.push_back("end\n\n");
+                continue;
+            }
+            if ((instruction == "return\n") && (!inside_subroutine)) error("return not in subroutine");
+            main_code.push_back(instruction);
+        }
+        else
+        {
+            // dealing with subroutines, after the "end" of a whitespace program
+            if (instruction == "end\n\n") continue;
+            vector<string> inst = split_token(instruction);
+            if (inst[0] == "block")
+            {
+                inside_subroutine = true;
+                subroutines.push_back("(func " + inst[1] + "\n");
+                if ( (contains(inst[1], subroutine_names)) || ((contains(inst[1], label_names))) ) error("subroutine name is a duplicate of subroutine/label names");
+                subroutine_names.push_back(inst[1]);
+                continue;
+            }
+            else if (instruction == "return\n")
+            {
+                if (!inside_subroutine) error("return not in subroutine");
+                subroutines.push_back(")\n\n");
+                inside_subroutine = false;
+                continue;
+            }
+            if (!inside_subroutine) error("non-subroutine code inside subroutine section");
+            subroutines.push_back(instruction);
+        }
+    }
+
+    // check that all the subroutine calls in main code exist
+    for (auto &instruction : main_code) subroutine_exists(instruction, subroutine_names);
+
+    // check that all subroutine calls inside subroutines exist
+    for (auto &instruction : subroutines) subroutine_exists(instruction, subroutine_names);
+
+    // check that all code jumps are valid
+    unsigned int label_name_it = 0;
+    unsigned int current_block_location = 0;
+    string current_block;
+    string next_block;
+
+    bool first_loop = true;
+    bool loop_structure = false;
+
+    for (unsigned int i = 0; i < main_code.size(); i++)
+    {
+        string instruction = main_code[i];
+        vector<string> inst = split_token(instruction);
+        if (inst[0] == "block")
+        {
+            if (!first_loop) label_name_it++;
+            first_loop = false;
+            if ( label_name_it == label_names.size()-1 )
+            {
+                current_block = label_names[label_name_it];
+                current_block_location = i;
+                next_block = "";
+            }
+            else if (label_name_it < label_names.size()-1)
+            {
+                current_block = label_names[label_name_it];
+                current_block_location = i;
+                next_block = label_names[label_name_it+1];
+            }
+            continue;
+        }
+        else if (inst[0] == "br")
+        {
+            if (inst[1] == current_block)
+            {
+                // loop
+                main_code[current_block_location] = "block " + current_block + "\nloop " + current_block + "_l\n";
+                main_code[i] = "br " + current_block + "_l\n";
+                loop_structure = true;
+            }
+            else if (inst[1] == next_block) main_code[i] =  "br " + current_block + "\n";
+            else error("jumping outside of local block space");
+        }
+        else if (inst[0] == "br_if")
+        {
+            if (inst[1] == current_block)
+            {
+                // loop
+                main_code[current_block_location] = "block " + current_block + "\nloop " + current_block + "_l\n";
+                main_code[i] = "br_if " + current_block + "_l\n";
+                loop_structure = true;
+            }
+            else if (inst[1] == next_block) main_code[i] =  "br_if " + current_block + "\n";
+            else error("jumping outside of local block space");
+        }
+        else if (inst[0] == "end")
+        {
+            if (loop_structure)
+            {
+                main_code[i] = "end\nend\n\n";
+                loop_structure = false;
+            }
+        }
+    }
+    return make_tuple(main_code, subroutines);
 }
 
 vector<string> map_commands(vector<string> tokens)
 {
     bool first_token = true;
-    vector<string> block_commands;
+    vector<string> instructions;
 
     for (auto &token : tokens)
     {
@@ -30,57 +200,72 @@ vector<string> map_commands(vector<string> tokens)
         if (first_token)
         {
             first_token = false;
-            if (toks[0] != "mark") block_commands.push_back("block $mainStartBlockNobodyUseThisNameEver\n");
+            if (toks[0] != "mark") instructions.push_back("block $mainBlock\n");
         }
 
         // Stack Manipulation
-        if (toks[0] == "push") block_commands.push_back("i32.const " + toks[1] + "\ncall $push\n");
-        else if (toks[0] == "duplicate") block_commands.push_back("call $duplicate\n");
-        else if (toks[0] == "copy") block_commands.push_back("i32.const " + toks[1] + "\ncall $copy\n");
-        else if (toks[0] == "swap") block_commands.push_back("call $swap\n");
-        else if (toks[0] == "discard") block_commands.push_back("call $discard\n");
-        else if (toks[0] == "slide") block_commands.push_back("i32.const " + toks[1] + "\ncall $slide\n");
+        if (toks[0] == "push") instructions.push_back("i32.const " + toks[1] + "\ncall $push\n");
+        else if (toks[0] == "duplicate") instructions.push_back("call $duplicate\n");
+        else if (toks[0] == "copy") instructions.push_back("i32.const " + toks[1] + "\ncall $copy\n");
+        else if (toks[0] == "swap") instructions.push_back("call $swap\n");
+        else if (toks[0] == "discard") instructions.push_back("call $discard\n");
+        else if (toks[0] == "slide") instructions.push_back("i32.const " + toks[1] + "\ncall $slide\n");
 
         // Arithmetic
-        else if (toks[0] == "add") block_commands.push_back("call $add\n");
-        else if (toks[0] == "sub") block_commands.push_back("call $sub\n");
-        else if (toks[0] == "mul") block_commands.push_back("call $mul\n");
-        else if (toks[0] == "div") block_commands.push_back("call $div\n");
-        else if (toks[0] == "mod") block_commands.push_back("call $mod\n");
+        else if (toks[0] == "add") instructions.push_back("call $add\n");
+        else if (toks[0] == "sub") instructions.push_back("call $sub\n");
+        else if (toks[0] == "mul") instructions.push_back("call $mul\n");
+        else if (toks[0] == "div") instructions.push_back("call $div\n");
+        else if (toks[0] == "mod") instructions.push_back("call $mod\n");
 
         // Heap Access
-        else if (toks[0] == "store") block_commands.push_back("call $store\n");
-        else if (toks[0] == "retrieve") block_commands.push_back("call $load\n");
+        else if (toks[0] == "store") instructions.push_back("call $store\n");
+        else if (toks[0] == "retrieve") instructions.push_back("call $load\n");
 
         // Flow Control
         else if (toks[0] == "mark")
         {
-            block_commands.push_back("end\n");
-            block_commands.push_back("block $" + toks[1] + "\n");
+            instructions.push_back("end\n\n");
+            instructions.push_back("block $" + toks[1] + "\n");
         }
-        else if (toks[0] == "call") block_commands.push_back("call " + toks[1] + "\n");
-        else if (toks[0] == "jump") block_commands.push_back("br $" + toks[1] + "\n");
+        else if (toks[0] == "call") instructions.push_back("call $" + toks[1] + "\n");
+        else if (toks[0] == "jump") instructions.push_back("br $" + toks[1] + "\n");
         else if (toks[0] == "jumpz")
         {
-            block_commands.push_back("call $pop\ni32.const 0\ni32.eq_s\n");
-            block_commands.push_back("br_if $" + toks[1] +"\n");
+            instructions.push_back("call $pop\ni32.eqz\n");
+            instructions.push_back("br_if $" + toks[1] +"\n");
         }
         else if (toks[0] == "jumpn")
         {
-            block_commands.push_back("call $pop\ni32.const 0\ni32.lt_s\n");
-            block_commands.push_back("br_if $" + toks[1] + "\n");
+            instructions.push_back("call $pop\ni32.const 0\ni32.lt_s\n");
+            instructions.push_back("br_if $" + toks[1] + "\n");
         }
-        else if (toks[0] == "return") block_commands.push_back("return\n");   /// todo
-        else if (toks[0] == "end") block_commands.push_back("endprog\n");   /// todo
+        else if (toks[0] == "return") instructions.push_back("return\n");   /// todo
+        else if (toks[0] == "end") instructions.push_back("endprog\n");   /// todo
 
         // I/O
-        else if (toks[0] == "out_char") block_commands.push_back("call $write_char\n");
-        else if (toks[0] == "out_num") block_commands.push_back("call $write_num\n");
-        else if (toks[0] == "read_char") block_commands.push_back("call $read_char\n");
-        else if (toks[0] == "read_num") block_commands.push_back("call $read_num\n");
+        else if (toks[0] == "out_char") instructions.push_back("call $write_char\n");
+        else if (toks[0] == "out_num") instructions.push_back("call $write_num\n");
+        else if (toks[0] == "read_char") instructions.push_back("call $read_char\n");
+        else if (toks[0] == "read_num") instructions.push_back("call $read_num\n");
 
     }
-    return block_commands;
+    return instructions;
+}
+
+bool contains(string item, vector<string> list)
+{
+    if ( find(list.begin(), list.end(), item) != list.end() ) return true;
+    return false;
+}
+
+void subroutine_exists(string instruction, vector<string> subroutine_names)
+{
+    vector<string> inst = split_token(instruction);
+    if (inst[0] == "call")
+    {
+        if ( !contains(inst[1], subroutine_names) ) error("calling an undefined subroutine: " + inst[1].substr(1));
+    }
 }
 
 vector<string> split_token(string token)
@@ -108,7 +293,7 @@ string gen_html(string fname)
         <title></title>
     </head>
     <body>
-        <script src=)" + fname + R"(></script>
+        <script src=")" + fname + R"("></script>
     </body>
     </html>)";
 }
@@ -160,7 +345,7 @@ string gen_js(string fname)
         .then(module => { return new WebAssembly.Instance(module, imports) });
     };
 
-    loadWebAssembly()" + fname + R"(, importObject)
+    loadWebAssembly(")" + fname + R"(", importObject)
       .then(instance => {
         main = instance.exports.main;
         console.log('Finished compiling! Type main() to run the program');
@@ -176,8 +361,8 @@ string gen_wat(string program, string subroutines)
     ;; io js functions
     (import "console" "read_char" (func $read_char_js (result i32)))
     (import "console" "read_num" (func $read_num_js (result i32)))
-    (import "console" "write_char" (func $write_char (param i32)))
-    (import "console" "write_num" (func $write_num (param i32)))
+    (import "console" "write_char" (func $write_char_js (param i32)))
+    (import "console" "write_num" (func $write_num_js (param i32)))
 
 
     (memory 2)
@@ -354,6 +539,16 @@ string gen_wat(string program, string subroutines)
         call $check_heap_bounds
         call $read_num_js
         i32.store
+    )
+
+    (func $write_char
+        call $pop
+        call $write_char_js
+    )
+
+    (func $write_num
+        call $pop
+        call $write_num_js
     )
 
     )"  + subroutines + R"(

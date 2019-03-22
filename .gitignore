@@ -1,7 +1,3 @@
 *.out
 
 wswac
-
-wasm/*
-ws/*
-wst/*

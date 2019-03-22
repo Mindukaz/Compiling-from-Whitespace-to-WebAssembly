@@ -1,5 +1,30 @@
 #include "wst_to_ws.h"
-#include "main.h"
+
+void valid(vector<string> tokens)
+{
+    vector<string> multi_tokens = {"push", "copy", "slide", "mark", "call", "jumpz", "jumpn", "jump"};
+    int line = 0;
+
+    for (auto &t : tokens)
+    {
+        line++;
+        vector<string> toks = split_token(t);
+
+        if ( contains(toks[0], multi_tokens) )
+        {
+            try
+            {
+                stoi(toks[1]);
+            }
+            catch (const std::invalid_argument& ia)
+            {
+                error("Line " + to_string(line) + ": instruction " + toks[0] + " takes an argument, none provided");
+            }
+        }
+    }
+
+
+}
 
 vector<string> read_file(string file_name)
 {
@@ -55,19 +80,35 @@ vector<string> process_commands(vector<string> commands)
     int line_num = 0;
     vector<string> ws_commands;
 
-    for(auto &command : commands)
+    for(auto &token : commands)
     {
         line_num++;
-        string command4 = command.substr(0,4);
-        string command5 = command.substr(0,5);
+        string command;
+        string value;
+        string val_bits;
+        vector<string> multi_token = {"push", "copy", "slide", "mark", "call", "jumpz", "jumpn", "jump"};
+        vector<string> toks = split_token(token);
+        command = toks[0];
+
+        if ( contains(toks[0], multi_token) )
+        {
+            try
+            {
+                val_bits = get_value_bits(toks[1]);
+            }
+            catch (const std::invalid_argument& ia)
+            {
+                error("Line " + to_string(line_num) + ": instruction " + toks[0] + " takes an argument, none provided");
+            }
+        }
 
         // Stack commands
-        if(command4 == "push") ws_commands.push_back("  " + get_value_bits(command.substr(5)));
+        if(command == "push") ws_commands.push_back("  " + val_bits);
         else if(command == "duplicate") ws_commands.push_back(" \n ");
-        else if(command4 == "copy") ws_commands.push_back(" \t " + get_value_bits(command.substr(5)));
+        else if(command == "copy") ws_commands.push_back(" \t " + val_bits);
         else if(command == "swap") ws_commands.push_back(" \n\t");
         else if(command == "discard") ws_commands.push_back(" \n\n");
-        else if(command5 == "slide") ws_commands.push_back(" \t\n" + get_value_bits(command.substr(6)));
+        else if(command == "slide") ws_commands.push_back(" \t\n" + val_bits);
 
         // Arithmetic
         else if(command == "add") ws_commands.push_back("\t   ");
@@ -81,11 +122,11 @@ vector<string> process_commands(vector<string> commands)
         else if(command == "retrieve") ws_commands.push_back("\t\t\t");
 
         // Control flow
-        else if(command4 == "mark") ws_commands.push_back("\n  " + get_value_bits(command.substr(5)));
-        else if(command4 == "call") ws_commands.push_back("\n \t" + get_value_bits(command.substr(5)));
-        else if(command5 == "jumpz") ws_commands.push_back("\n\t " + get_value_bits(command.substr(6)));
-        else if(command5 == "jumpn") ws_commands.push_back("\n\t\t" + get_value_bits(command.substr(6)));
-        else if(command4 == "jump") ws_commands.push_back("\n \n" + get_value_bits(command.substr(5)));
+        else if(command == "mark") ws_commands.push_back("\n  " + val_bits);
+        else if(command == "call") ws_commands.push_back("\n \t" + val_bits);
+        else if(command == "jumpz") ws_commands.push_back("\n\t " + val_bits);
+        else if(command == "jumpn") ws_commands.push_back("\n\t\t" + val_bits);
+        else if(command == "jump") ws_commands.push_back("\n \n" + val_bits);
         else if(command == "return") ws_commands.push_back("\n\t\n");
         else if(command == "end") ws_commands.push_back("\n\n\n");
 
@@ -103,7 +144,7 @@ vector<string> process_commands(vector<string> commands)
 
 void write_to_file_ws(vector<string> instructions, string fname)
 {
-    ofstream file(fname + ".ws");
+    ofstream file("ws/" + fname + ".ws");
     for(auto &instruction : instructions) file << instruction;
     file.close();
 }

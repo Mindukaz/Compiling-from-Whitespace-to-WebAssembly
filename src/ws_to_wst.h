@@ -39,6 +39,6 @@ int io(int location);
 
 void identify_commands();
 
-void write_file();
+void write_file(string fname);
 
 #endif

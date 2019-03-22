@@ -7,21 +7,13 @@ void generate_wasm(vector<string> commands, string fname)
     vector<string> subroutines;
     tie(main, subroutines) = code_blocks(code);
 
-    /*
-    cout << "Main Code Blocks:" << endl << endl;
-    for (auto &a : main) cout << a;
-
-    cout << endl << "Subroutines:" << endl << endl;
-    for (auto &a : subroutines) cout << a;
-    */
-
-    //size_t pos = fname.find(".");
     string name = fname.substr(0, fname.find(".")+1);
+    string dir = "wasm/";
 
-    string html_name = name + "html";
-    string js_name = name + "js";
-    string wat_name = name + "wat";
-    string wasm_name = name + "wasm";
+    string html_name = dir + name + "html";
+    string js_name = dir + name + "js";
+    string wat_name = dir + name + "wat";
+    string wasm_name = dir + name + "wasm";
 
     string code_main;
     string code_subroutine;
@@ -40,18 +32,6 @@ void generate_wasm(vector<string> commands, string fname)
     file.open(wat_name);
     file << gen_wat(code_main, code_subroutine);
     file.close();
-
-
-    // after this, get going with the better error handling, and test suite, and proper documentation for this.
-    // check what block is throwing an error
-    // check what label is trying to be called and print it
-
-    // errors with block jumping, print label of the block.
-
-    // make the wat file increase stack memory dynamically
-
-    // need to make sure that commands that take in a number dont segfault
-    // e.g copy will segfault the program, since it has to be copy <value>
 }
 
 tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
@@ -76,7 +56,7 @@ tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
             vector<string> label = split_token(instruction);
             if (label[0] == "block")
             {
-                if ( contains(label[1], label_names) ) error("duplicate label names");
+                if ( contains(label[1], label_names) ) error("Block " + label[1] + " is a duplicate name");
                 label_names.push_back(label[1]);
                 main_code.push_back(instruction);
                 continue;
@@ -99,7 +79,7 @@ tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
             {
                 inside_subroutine = true;
                 subroutines.push_back("(func " + inst[1] + "\n");
-                if ( (contains(inst[1], subroutine_names)) || ((contains(inst[1], label_names))) ) error("subroutine name is a duplicate of subroutine/label names");
+                if ( (contains(inst[1], subroutine_names)) || ((contains(inst[1], label_names))) ) error("Subroutine " + inst[1] + " is a duplicate name");
                 subroutine_names.push_back(inst[1]);
                 continue;
             }
@@ -110,7 +90,7 @@ tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
                 inside_subroutine = false;
                 continue;
             }
-            if (!inside_subroutine) error("non-subroutine code inside subroutine section");
+            if (!inside_subroutine) error("Non-subroutine code inside subroutine section");
             subroutines.push_back(instruction);
         }
     }
@@ -162,7 +142,7 @@ tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
                 loop_structure = true;
             }
             else if (inst[1] == next_block) main_code[i] =  "br " + current_block + "\n";
-            else error("jumping outside of local block space");
+            else error("Block " + current_block + ": jumping outside of local block space");
         }
         else if (inst[0] == "br_if")
         {
@@ -174,7 +154,7 @@ tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
                 loop_structure = true;
             }
             else if (inst[1] == next_block) main_code[i] =  "br_if " + current_block + "\n";
-            else error("jumping outside of local block space");
+            else error("Block " + current_block + ": jumping outside of local block space");
         }
         else if (inst[0] == "end")
         {
@@ -264,7 +244,7 @@ void subroutine_exists(string instruction, vector<string> subroutine_names)
     vector<string> inst = split_token(instruction);
     if (inst[0] == "call")
     {
-        if ( !contains(inst[1], subroutine_names) ) error("calling an undefined subroutine: " + inst[1].substr(1));
+        if ( !contains(inst[1], subroutine_names) ) error("Calling an undefined subroutine: " + inst[1].substr(1));
     }
 }
 
@@ -400,6 +380,18 @@ string gen_wat(string program, string subroutines)
         i32.const 4
         i32.add
         set_global $stack_pointer
+
+        ;; expand memory if needed
+        get_global $stack_pointer
+        current_memory
+        get_global $memory_page_size
+        i32.mul
+        i32.ge_s
+        if
+            i32.const 1
+            grow_memory
+            drop
+        end
     )
 
     (func $pop (result i32)

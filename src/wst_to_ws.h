@@ -7,7 +7,12 @@
 #include <string>
 #include <bitset>
 
+#include "main.h"
+#include "code_gen.h"
+
 using namespace std;
+
+void valid(vector<string> tokens);
 
 vector<string> read_file(string file_name);
 

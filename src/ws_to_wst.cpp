@@ -285,9 +285,11 @@ void identify_commands()
 	}
 }
 
-void write_file()
+void write_file(string fname)
 {
-	ofstream file("whitespace.wst");
+	size_t dot = fname.find_last_of(".");
+	string name = fname.substr(0, dot);
+	ofstream file("wst/" + name + ".wst");
 	for(auto &i : instructions) file << i << endl;
 	file.close();
 }

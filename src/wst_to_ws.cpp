@@ -3,22 +3,29 @@
 void valid(vector<string> tokens)
 {
     vector<string> multi_tokens = {"push", "copy", "slide", "mark", "call", "jumpz", "jumpn", "jump"};
+    vector<string> ws_tokens = {"push", "duplicate", "copy" ,"swap" ,"discard" ,"slide" ,"add" ,"sub"
+                            ,"mul","div" ,"mod" ,"store", "retrieve", "mark" ,"call" ,"jump" ,"jumpz"
+                            ,"jumpn","return", "end", "out_char", "out_num", "read_char", "read_num"};
     int line = 0;
 
     for (auto &t : tokens)
     {
+        cout << t << endl;
         line++;
         vector<string> toks = split_token(t);
 
+        if ( !contains(toks[0], ws_tokens) ) error("Line " + to_string(line) + ": Syntax error: Unknown command");
+
         if ( contains(toks[0], multi_tokens) )
         {
+            if (toks.size() != 2) error("Line " + to_string(line) + ": instruction " + toks[0] + " takes an argument, none provided");
             try
             {
                 stoi(toks[1]);
             }
             catch (const std::invalid_argument& ia)
             {
-                error("Line " + to_string(line) + ": instruction " + toks[0] + " takes an argument, none provided");
+                error("Line " + to_string(line) + ": instruction " + toks[0] + " takes an integer argument, bad argument");
             }
         }
     }

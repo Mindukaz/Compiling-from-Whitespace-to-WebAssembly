@@ -10,7 +10,7 @@ There is a Makefile. Use it. It wil create the program `wswac` (Whitespace WebAs
 
 ## Compiler behaviour
 
-The compiler will take both Whitespace source files and Whitespace text source files, and produce files in their respective folders. 
+The compiler will take both Whitespace source files and Whitespace text source files, and produce files in their respective folders.
 
 Whitespace source files will go into `ws/`.
 
@@ -24,7 +24,7 @@ To create WebAssembly files, run the compiler with either a `ws` or `wst` file l
 
 `wswac file.ws` or  `wswac file.wst`
 
-Then to convert the wat file to wasm : 
+Then to convert the wat file to wasm :
 
 `wat2wasm file.wat`
 
@@ -32,7 +32,7 @@ Finally, load the HTML file into a browser via HTTP client and enter the browser
 
 ## Translating between Whitespace and Whitespace text
 
-To translate a Whitespace text format file to normal Whitespace, run the following command: 
+To translate a Whitespace text format file to normal Whitespace, run the following command:
 `wswac -wst2ws file.wst`
 
 Likewise to translate a Whitespace file to a Whitespace text file, run this command:
@@ -74,12 +74,12 @@ Likewise to translate a Whitespace file to a Whitespace text file, run this comm
 | Top stack item is stored at address identified by second top item on stack    | `TTS` | `store` |
 | Top of stack identifies address, from which to load item and push it onto stack   | `TTT`   |   `retrieve` |
 
-## Flow Control
+## Control Flow
 
 | Description        | Whitespace        | Whitespace Text |
 | ------------- |:-------------:|:-----:|
 | Create a label   | `¬SS`| `mark <label>` |
-| Call a subroutine / Jump to a label than will jump back to the caller after executing a return   | `¬ST`   |  `call <label>` |
+| Call a subroutine / Jump to a label that will jump back to the caller after executing a return   | `¬ST`   |  `call <label>` |
 | Jump to a label | `¬S¬`  |  `jump <label>` |
 | Jump to a label if top of stack is zero | `¬TS`   |  `jumpz <label>` |
 | Jump to a label if top of stack is a negative | `¬TT`   |  `jumpn <label>` |
@@ -99,15 +99,15 @@ Likewise to translate a Whitespace file to a Whitespace text file, run this comm
 
 There cannot be duplicate label names. This includes subroutines as they are defined by labels.
 
-## Flow Control 
-Becasue of how WebAssembly handles flow control, the Whitespace flow control has to be restricted. 
+## Control Flow
+Becasue of how WebAssembly handles flow control, the Whitespace flow control has to be restricted.
 
 **Jumps can only be made to the next label and the previous label. NO JUMPING TO ANY OTHER LOCATIONS**. Does not apply to subroutine calling.
 
 Example in Whitespace Text:
 
 
-If A is a jump 
+If A is a jump
 ```
 mark 1
 ...

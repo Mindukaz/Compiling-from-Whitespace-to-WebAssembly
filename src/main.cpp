@@ -1,14 +1,6 @@
 #include "main.h"
 
 
-/*
- ./main.out file.ws
- ./main.out file.wst
- ./main.out -wst2ws file.wst
- ./main.out -ws2wst file.ws
-*/
-
-
 int main(int argc, char* argv[])
 {
     size_t slash;

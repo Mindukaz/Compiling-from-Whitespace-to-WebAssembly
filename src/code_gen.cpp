@@ -95,6 +95,8 @@ tuple<vector<string>, vector<string>> code_blocks(vector<string> code)
         }
     }
 
+    if (!end_prog) error("\'end\' instruction not found. There must be an \'end\' at the end of a Whitespace program");
+
     // check that all the subroutine calls in main code exist
     for (auto &instruction : main_code) subroutine_exists(instruction, subroutine_names);
 
@@ -220,8 +222,8 @@ vector<string> map_commands(vector<string> tokens)
             instructions.push_back("call $pop\ni32.const 0\ni32.lt_s\n");
             instructions.push_back("br_if $" + toks[1] + "\n");
         }
-        else if (toks[0] == "return") instructions.push_back("return\n");   /// todo
-        else if (toks[0] == "end") instructions.push_back("endprog\n");   /// todo
+        else if (toks[0] == "return") instructions.push_back("return\n");
+        else if (toks[0] == "end") instructions.push_back("endprog\n");
 
         // I/O
         else if (toks[0] == "out_char") instructions.push_back("call $write_char\n");

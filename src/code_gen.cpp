@@ -10,10 +10,10 @@ void generate_wasm(vector<string> commands, string fname)
     string name = fname.substr(0, fname.find(".")+1);
     string dir = "wasm/";
 
-    string html_name = dir + name + "html";
-    string js_name = dir + name + "js";
-    string wat_name = dir + name + "wat";
-    string wasm_name = dir + name + "wasm";
+    string html_name = name + "html";
+    string js_name = name + "js";
+    string wat_name = name + "wat";
+    string wasm_name = name + "wasm";
 
     string code_main;
     string code_subroutine;
@@ -21,15 +21,15 @@ void generate_wasm(vector<string> commands, string fname)
     for (auto &instruction : subroutines) code_subroutine += instruction;
 
     ofstream file;
-    file.open(html_name);
+    file.open(dir + html_name);
     file << gen_html(js_name);
     file.close();
 
-    file.open(js_name);
+    file.open(dir + js_name);
     file << gen_js(wasm_name);
     file.close();
 
-    file.open(wat_name);
+    file.open(dir + wat_name);
     file << gen_wat(code_main, code_subroutine);
     file.close();
 }

@@ -43,7 +43,7 @@
         .then(module => { return new WebAssembly.Instance(module, imports) });
     };
 
-    loadWebAssembly("wasm/helloworld.wasm", importObject)
+    loadWebAssembly("helloworld.wasm", importObject)
       .then(instance => {
         main = instance.exports.main;
         console.log('Finished compiling! Type main() to run the program');

@@ -78,8 +78,6 @@ int get_value(string bits)
 
 int stack_manipulation(int location)
 {
-	//cout << "stack manipulation" << endl;
-
 	int value;
 	// Push value onto stack
 	if(text_chars[location + 1] == SPACE)
@@ -131,8 +129,6 @@ int stack_manipulation(int location)
 
 int arithmetic(int location)
 {
-	//cout << "arithmetic" << endl;
-
 	if(text_chars[location + 2] == SPACE)
 	{
 		switch(text_chars[location + 3])
@@ -165,8 +161,6 @@ int arithmetic(int location)
 
 int heap_access(int location)
 {
-	//cout << "heap" << endl;
-
 	switch(text_chars[location + 2])
 	{
 		case SPACE: instructions.push_back("store");
@@ -181,8 +175,6 @@ int heap_access(int location)
 
 int flow_control(int location)
 {
-	//cout << "flow control" << endl;
-
 	switch(text_chars[location + 1])
 	{
 		case SPACE: switch(text_chars[location + 2])
@@ -221,8 +213,6 @@ int flow_control(int location)
 
 int io(int location)
 {
-	//cout << "io" << endl;
-
 	if(text_chars[location + 2] == SPACE)
 	{
 		switch(text_chars[location + 3])

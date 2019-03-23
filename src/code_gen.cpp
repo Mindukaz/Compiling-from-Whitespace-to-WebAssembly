@@ -499,26 +499,28 @@ string gen_wat(string program, string subroutines)
     )
 
     ;; Heap Access
-    (func $store (param $address i32) (param $data i32)
-        get_local $address
+    (func $store
+        call $swap
+        call $pop
         i32.const 4
         i32.mul
         call $check_heap_bounds
-        get_local $data
+        call $pop
         i32.store
     )
 
-    (func $load (param $address i32) (result i32)
-        get_local $address
+    (func $load
+        call $pop
         i32.const 4
         i32.mul
         call $check_heap_bounds
         i32.load
+        call $push
     )
 
     ;; I/O
-    (func $read_char (param $address i32)
-        get_local $address
+    (func $read_char
+        call $pop
         i32.const 4
         i32.mul
         call $check_heap_bounds
@@ -526,8 +528,8 @@ string gen_wat(string program, string subroutines)
         i32.store
     )
 
-    (func $read_num (param $address i32)
-        get_local $address
+    (func $read_num
+        call $pop
         i32.const 4
         i32.mul
         call $check_heap_bounds

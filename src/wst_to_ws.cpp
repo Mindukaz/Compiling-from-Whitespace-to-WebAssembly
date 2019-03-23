@@ -10,7 +10,6 @@ void valid(vector<string> tokens)
 
     for (auto &t : tokens)
     {
-        cout << t << endl;
         line++;
         vector<string> toks = split_token(t);
 

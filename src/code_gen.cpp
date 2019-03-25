@@ -294,7 +294,6 @@ string gen_js(string fname)
 
     function read_char_f() {
         var input = prompt("Enter a character:");
-        var input = readline();
         while (input.length != 1) {
             input = prompt("Enter a SINGLE CHARACTER:");
         }
